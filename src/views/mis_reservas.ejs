@@ -1,0 +1,25 @@
+<section>
+  <h2>Mis reservas</h2>
+
+  <% if (reservas && reservas.length) { %>
+    <ul>
+      <% reservas.forEach(r => { %>
+        <li>
+          <strong>Reserva ID:</strong> <%= r.id %><br>
+          <strong>Fecha:</strong> <%= r.fecha.toLocaleString('es-CL') %><br>
+          <strong>Total:</strong> $<%= r.total.toLocaleString('es-CL') %><br>
+          <strong>Items:</strong>
+          <ul>
+            <% r.items.forEach(it => { %>
+              <li>
+                <%= it.nombre %> — Cant: <%= it.cantidad %> — Precio: $<%= it.precio.toLocaleString('es-CL') %>
+              </li>
+            <% }) %>
+          </ul>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p>No tienes reservas registradas.</p>
+  <% } %>
+</section>

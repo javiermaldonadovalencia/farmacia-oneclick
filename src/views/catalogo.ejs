@@ -1,0 +1,28 @@
+<section class="catalogo">
+  <h2>Catálogo</h2>
+
+  <% if (products && products.length) { %>
+    <div class="product-list">
+      <% products.forEach(p => { %>
+        <article class="product-item">
+          <h3 class="product-name"><%= p.nombre %></h3>
+          <p class="product-meta">
+            <span class="product-price">$<%= p.precio.toLocaleString('es-CL') %></span>
+            <span class="product-stock">Stock: <%= p.stock %></span>
+          </p>
+
+          <% if (user) { %>
+            <form action="/carrito/agregar" method="post" class="product-form">
+              <input type="hidden" name="id" value="<%= p.id %>">
+              <button type="submit">Agregar al carrito</button>
+            </form>
+          <% } else { %>
+            <p class="product-login-hint">Inicia sesión para agregar al carrito.</p>
+          <% } %>
+        </article>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <p>No hay productos.</p>
+  <% } %>
+</section>

@@ -1,0 +1,19 @@
+<section>
+  <h2>Ingresar</h2>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <p style="color:red;"><%= error %></p>
+  <% } %>
+
+  <form method="post" action="/login">
+    <div>
+      <label>Email</label>
+      <input name="email" type="email" required>
+    </div>
+    <div>
+      <label>Clave</label>
+      <input name="password" type="password" required>
+    </div>
+    <button type="submit">Entrar</button>
+  </form>
+</section>

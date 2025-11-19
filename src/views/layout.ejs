@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title ? (title + ' — Farmacia') : 'Farmacia' %></title>
+  <link rel="stylesheet" href="/static/styles/tokens.css">
+  <link rel="stylesheet" href="/static/styles/base.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Farmacia Web One-Click</h1>
+      <nav>
+        <a href="/">Inicio</a>
+        <a href="/catalogo">Catálogo</a>
+
+        <% if (typeof user !== 'undefined' && user) { %>
+          <a href="/direcciones/nueva" style="margin-left:1rem;">Nueva dirección</a>
+          <a href="/mis-direcciones" style="margin-left:1rem;">Mis direcciones</a>
+          <a href="/carrito" style="margin-left:1rem;">Mi carrito</a>
+          <a href="/mis-reservas" style="margin-left:1rem;">Mis reservas</a>
+        <% } %>
+
+        <% if (typeof user !== 'undefined' && user && user.role === 'ADMIN') { %>
+          <a href="/admin" style="margin-left:1rem;">Admin</a>
+        <% } %>
+
+        <% if (typeof user !== 'undefined' && user) { %>
+          <span style="margin-left:1rem; color:white; display:flex; align-items:center; gap:4px;">
+  <svg style="width:16px; height:16px; fill:white;"
+       xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.4c-3.3 0-9.8 1.6-9.8 4.9v2.5h19.6v-2.5c0-3.3-6.5-4.9-9.8-4.9z"/>
+  </svg>
+  <%= user.email %> (<%= user.role %>)
+</span>
+
+          <form action="/logout" method="post" style="display:inline; margin-left:1rem;">
+            <button type="submit">Salir</button>
+          </form>
+        <% } else { %>
+  <a href="/login" style="margin-left:1rem;">
+    <svg style="width:16px; height:16px; vertical-align:middle; margin-right:4px; fill:white;" 
+     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.4c-3.3 0-9.8 1.6-9.8 4.9v2.5h19.6v-2.5c0-3.3-6.5-4.9-9.8-4.9z"/>
+</svg>
+Mi cuenta
+
+  </a>
+<% } %>
+
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <%- body %>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <small>© <%= new Date().getFullYear() %></small>
+    </div>
+  </footer>
+</body>
+</html>

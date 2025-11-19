@@ -1,0 +1,28 @@
+<section>
+  <h2>Mi carrito</h2>
+
+  <% if (carrito && carrito.length) { %>
+    <ul>
+      <% let total = 0; %>
+      <% carrito.forEach(item => { 
+           total += item.precio * item.cantidad;
+      %>
+        <li>
+          <strong><%= item.nombre %></strong>
+          — Cantidad: <%= item.cantidad %>
+          — Precio unidad: $<%= item.precio.toLocaleString('es-CL') %>
+          — Subtotal: $<%= (item.precio * item.cantidad).toLocaleString('es-CL') %>
+        </li>
+      <% }) %>
+    </ul>
+
+        <p><strong>Total:</strong> $<%= total.toLocaleString('es-CL') %></p>
+
+    <form action="/carrito/confirmar" method="post">
+      <button type="submit">Confirmar reserva</button>
+    </form>
+  <% } else { %>
+    <p>Tu carrito está vacío.</p>
+  <% } %>
+</section>
+

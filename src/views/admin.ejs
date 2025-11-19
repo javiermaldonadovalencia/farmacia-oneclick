@@ -1,0 +1,37 @@
+<section>
+  <h2>Panel Admin</h2>
+  <h3>Crear producto</h3>
+
+  <form method="post" action="/admin/producto/nuevo">
+    <div>
+      <label>Nombre</label>
+      <input name="nombre" required>
+    </div>
+    <div>
+      <label>Precio (CLP)</label>
+      <input name="precio" type="number" min="0" step="1" required>
+    </div>
+    <div>
+      <label>Stock</label>
+      <input name="stock" type="number" min="0" step="1" required>
+    </div>
+    <button type="submit">Crear</button>
+  </form>
+
+  <hr>
+
+  <h3>Productos</h3>
+  <% if (products && products.length) { %>
+    <ul>
+      <% products.forEach(p => { %>
+        <li>
+          <strong><%= p.nombre %></strong>
+          — $<%= p.precio.toLocaleString('es-CL') %>
+          — Stock: <%= p.stock %>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p>No hay productos.</p>
+  <% } %>
+</section>

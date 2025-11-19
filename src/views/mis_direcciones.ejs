@@ -1,0 +1,16 @@
+<section>
+  <h2>Mis direcciones</h2>
+
+  <% if (direcciones && direcciones.length) { %>
+    <ul>
+      <% direcciones.forEach(d => { %>
+        <li>
+          <strong><%= d.calle %></strong>, <%= d.comuna %>
+          <% if (d.ref) { %> — <em><%= d.ref %></em><% } %>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p>No tienes direcciones guardadas.</p>
+  <% } %>
+</section>
