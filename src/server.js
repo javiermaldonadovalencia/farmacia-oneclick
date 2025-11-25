@@ -498,6 +498,6 @@ app.post('/newsletter/suscribir', (req, res) => {
 // Encender
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
