@@ -1,15 +1,29 @@
 <section>
   <h2>Mis direcciones</h2>
 
+  <p>
+    <a href="/direcciones/nueva" class="btn-add-address">+ Agregar nueva dirección</a>
+  </p>
+
   <% if (direcciones && direcciones.length) { %>
     <ul>
-      <% direcciones.forEach(d => { %>
-        <li>
-          <strong><%= d.calle %></strong>, <%= d.comuna %>
-          <% if (d.ref) { %> — <em><%= d.ref %></em><% } %>
-        </li>
-      <% }) %>
-    </ul>
+  <% direcciones.forEach((d, index) => { %>
+    <li class="address-item">
+      <span class="address-text">
+        <strong><%= d.calle %></strong>, <%= d.comuna %>
+        <% if (d.ref) { %>
+          — <em><%= d.ref %></em>
+        <% } %>
+      </span>
+
+      <form action="/direcciones/eliminar" method="post">
+        <input type="hidden" name="index" value="<%= index %>">
+        <button type="submit" class="btn-delete-address">Eliminar</button>
+      </form>
+    </li>
+  <% }) %>
+</ul>
+
   <% } else { %>
     <p>No tienes direcciones guardadas.</p>
   <% } %>

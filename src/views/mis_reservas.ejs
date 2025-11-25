@@ -1,25 +1,74 @@
 <section>
-  <h2>Mis reservas</h2>
+  <h2>Mis pedidos</h2>
+
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert-success">
+      <div class="alert-icon">✔</div>
+      <div>
+        <strong>Orden procesada</strong>
+        <p>Tu pedido fue registrado correctamente.</p>
+      </div>
+    </div>
+  <% } %>
 
   <% if (reservas && reservas.length) { %>
-    <ul>
-      <% reservas.forEach(r => { %>
-        <li>
-          <strong>Reserva ID:</strong> <%= r.id %><br>
-          <strong>Fecha:</strong> <%= r.fecha.toLocaleString('es-CL') %><br>
-          <strong>Total:</strong> $<%= r.total.toLocaleString('es-CL') %><br>
-          <strong>Items:</strong>
+    <div class="orders-list">
+      <% reservas.forEach(function (r) { %>
+        <article class="order-card">
+          <p><strong>Pedido ID:</strong> <%= r.id %></p>
+          <p><strong>Fecha:</strong> <%= r.fecha.toLocaleString('es-CL') %></p>
+          <p><strong>Total:</strong> $<%= r.total.toLocaleString('es-CL') %></p>
+          <p>
+            <strong>Tipo de entrega:</strong>
+            <%= r.tipoEntrega === 'delivery' ? 'Despacho a domicilio' : 'Retiro en local' %>
+          </p>
+
+          <% if (r.direccion) { %>
+            <p>
+              <strong>Dirección:</strong>
+              <%= r.direccion.calle %>, <%= r.direccion.comuna %>
+              <% if (r.direccion.ref) { %> — <em><%= r.direccion.ref %></em><% } %>
+            </p>
+          <% } %>
+
+          <p><strong>Productos:</strong></p>
           <ul>
-            <% r.items.forEach(it => { %>
+            <% r.items.forEach(function (it) { %>
               <li>
                 <%= it.nombre %> — Cant: <%= it.cantidad %> — Precio: $<%= it.precio.toLocaleString('es-CL') %>
               </li>
-            <% }) %>
+            <% }); %>
           </ul>
-        </li>
-      <% }) %>
-    </ul>
+
+          <p>
+            <strong>Estado:</strong>
+            <span class="estado-chip <%= (r.estado === 'Entregado' || r.estado === 'Completado') ? 'estado-completado' : (r.estado === 'Cancelado' ? 'estado-cancelado' : 'estado-pendiente') %>">
+              <%= r.estado || 'Pendiente' %>
+            </span>
+          </p>
+
+          <p>
+            <strong>Puntos obtenidos:</strong>
+            <span class="puntos-chip"><%= r.puntos || 0 %></span>
+          </p>
+        </article>
+      <% }); %>
+    </div>
   <% } else { %>
-    <p>No tienes reservas registradas.</p>
+    <p>No tienes pedidos registrados.</p>
   <% } %>
+
+  <script>
+  setTimeout(function () {
+    var alertBox = document.querySelector('.alert-success');
+    if (alertBox) {
+      alertBox.style.opacity = '0';
+      alertBox.style.transform = 'translateY(-6px)';
+      setTimeout(function () {
+        alertBox.remove();
+      }, 400);
+    }
+  }, 4000); // 4 segundos
+</script>
+
 </section>

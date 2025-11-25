@@ -53,23 +53,51 @@
   </article>
 </section>
 
+
+<% if (subOk) { %>
+  <div class="alert-sub">
+    Gracias por suscribirte a nuestras ofertas 🩺
+  </div>
+
+  <script>
+    setTimeout(function () {
+      const el = document.querySelector('.alert-sub');
+      if (el) el.remove();
+    }, 4000); 
+  </script>
+<% } %>
+
+
+
 <section class="newsletter">
   <div class="newsletter-text">
     <h2>Recibe ofertas y contenido saludable</h2>
     <p>Suscríbete para recibir promociones y consejos de salud en tu correo.</p>
   </div>
 
-  <form class="newsletter-form">
+  <form class="newsletter-form" action="/suscribirme" method="post">
     <div class="field">
       <label for="nombre-news">Nombre</label>
-      <input id="nombre-news" type="text" placeholder="ej: Sofía Pérez">
+      <input
+        id="nombre-news"
+        type="text"
+        name="nombre"
+        placeholder="ej: Sofía Pérez"
+        required
+      >
     </div>
 
     <div class="field">
       <label for="email-news">Email</label>
-      <input id="email-news" type="email" placeholder="ej: usuario@email.com">
+      <input
+        id="email-news"
+        type="email"
+        name="email"
+        placeholder="ej: usuario@email.com"
+        required
+      >
     </div>
 
-    <button type="button">Inscribirme</button>
+    <button type="submit">Inscribirme</button>
   </form>
 </section>

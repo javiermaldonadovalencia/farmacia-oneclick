@@ -1,19 +1,60 @@
 <section class="catalogo">
   <h2>Catálogo</h2>
 
+    <% if (typeof added !== 'undefined' && added) { %>
+    <div class="toast-success" id="toast-agregado">
+      <span class="toast-icon">✔</span>
+      <span>Producto agregado al carrito</span>
+    </div>
+  <% } %>
+
+
   <% if (products && products.length) { %>
     <div class="product-list">
       <% products.forEach(p => { %>
         <article class="product-item">
+          <% if (p.descuento && p.descuento > 0) { %>
+            <div class="product-discount-badge">
+              -<%= p.descuento %>%
+            </div>
+          <% } %>
+
+          <% if (p.img) { %>
+            <div class="product-image-wrapper">
+              <img
+                src="<%= p.img %>"
+                alt="<%= p.nombre %>"
+                class="product-image"
+              >
+            </div>
+          <% } %>
+
           <h3 class="product-name"><%= p.nombre %></h3>
+
           <p class="product-meta">
-            <span class="product-price">$<%= p.precio.toLocaleString('es-CL') %></span>
-            <span class="product-stock">Stock: <%= p.stock %></span>
+            <span class="product-price">
+              $<%= p.precio.toLocaleString('es-CL') %>
+            </span>
+
+            <% if (user && user.role === 'ADMIN') { %>
+              <span class="product-stock">
+                Stock: <%= p.stock %>
+              </span>
+            <% } %>
           </p>
 
           <% if (user) { %>
             <form action="/carrito/agregar" method="post" class="product-form">
               <input type="hidden" name="id" value="<%= p.id %>">
+
+              <input
+                type="number"
+                name="cantidad"
+                value="1"
+                min="1"
+                class="cantidad-input"
+              >
+
               <button type="submit">Agregar al carrito</button>
             </form>
           <% } else { %>
@@ -25,4 +66,26 @@
   <% } else { %>
     <p>No hay productos.</p>
   <% } %>
+
+  <a href="/carrito" class="floating-cart-btn">
+    <i class="fa-solid fa-cart-shopping"></i>
+    Ver carrito
+  </a>
+
+
+  <script>
+  (function () {
+    const toast = document.getElementById('toast-agregado');
+    if (toast) {
+      setTimeout(function () {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-4px)';
+        setTimeout(function () {
+          toast.remove();
+        }, 400);
+      }, 3000); // 3 segundos
+    }
+  })();
+</script>
+
 </section>

@@ -1,28 +1,154 @@
 <section>
-  <h2>Mi carrito</h2>
+  <div class="cart-card">
+    <h2>Mi carrito</h2>
 
-  <% if (carrito && carrito.length) { %>
-    <ul>
+    <% if (carrito && carrito.length) { %>
       <% let total = 0; %>
-      <% carrito.forEach(item => { 
-           total += item.precio * item.cantidad;
-      %>
-        <li>
-          <strong><%= item.nombre %></strong>
-          — Cantidad: <%= item.cantidad %>
-          — Precio unidad: $<%= item.precio.toLocaleString('es-CL') %>
-          — Subtotal: $<%= (item.precio * item.cantidad).toLocaleString('es-CL') %>
-        </li>
-      <% }) %>
-    </ul>
 
-        <p><strong>Total:</strong> $<%= total.toLocaleString('es-CL') %></p>
+      <div class="cart-list">
+        <% carrito.forEach(function (item, index) { %>
+          <%
+            const tasaDesc = (item.descuento || 0) / 100;
+            const precioConDesc = Math.round(item.precio * (1 - tasaDesc));
+            const subtotal = precioConDesc * item.cantidad;
+            total = total + subtotal;
+          %>
 
-    <form action="/carrito/confirmar" method="post">
-      <button type="submit">Confirmar reserva</button>
-    </form>
-  <% } else { %>
-    <p>Tu carrito está vacío.</p>
-  <% } %>
+          <div class="cart-item">
+            <div class="cart-item-info">
+              <div class="cart-item-name">
+                <strong><%= item.nombre %></strong>
+              </div>
+
+              <div class="cart-item-details">
+                <span class="chip">Cant: <%= item.cantidad %></span>
+                <span class="chip">Precio: $<%= item.precio.toLocaleString('es-CL') %></span>
+
+                <% if (item.descuento && item.descuento > 0) { %>
+                  <span class="chip discount-chip">Desc: <%= item.descuento %>%</span>
+                <% } %>
+
+                <span class="chip total-chip">
+                  Total: $<%= subtotal.toLocaleString('es-CL') %>
+                </span>
+              </div>
+            </div>
+
+            <form action="/carrito/eliminar" method="post" class="cart-item-actions">
+              <input type="hidden" name="index" value="<%= index %>">
+              <button type="submit" class="btn-delete">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </form>
+          </div>
+        <% }); %>
+      </div>
+
+      <p class="cart-total-line">
+  <span>Total:</span>
+  <strong>$<%= total.toLocaleString('es-CL') %></strong>
+</p>
+
+
+            <form action="/carrito/confirmar" method="post">
+
+        <fieldset style="margin-bottom: 1rem;">
+  <legend>Método de pago</legend>
+
+  <label>
+    <input type="radio" name="metodoPago" value="Efectivo" checked>
+    Efectivo
+  </label>
+
+  <label>
+    <input type="radio" name="metodoPago" value="Transferencia">
+    Transferencia
+  </label>
+
+  <label>
+    <input type="radio" name="metodoPago" value="Tarjeta débito/crédito">
+    Tarjeta débito/crédito
+  </label>
+</fieldset>
+
+
+        <!-- 2) Tipo de entrega -->
+        <fieldset>
+          <legend>Tipo de entrega</legend>
+          <label>
+            <input type="radio" name="tipoEntrega" value="retiro" checked>
+            Retiro en local
+          </label>
+          <label>
+            <input type="radio" name="tipoEntrega" value="delivery">
+            Despacho a domicilio
+          </label>
+        </fieldset>
+
+        <!-- Bloque tiendas (para retiro en local) -->
+        <div id="bloque-tiendas">
+          <p>
+            <label for="tiendaSeleccionada">Elige tu tienda más cercana:</label>
+            <select name="tienda" id="tiendaSeleccionada">
+              <option value="centro">Farmacia One-Click Centro</option>
+              <option value="mall">Farmacia One-Click Mall</option>
+            </select>
+          </p>
+        </div>
+
+        <!-- Bloque direcciones (para delivery) -->
+        <div id="bloque-direcciones" style="display:none;">
+          <% if (direcciones && direcciones.length) { %>
+            <p>
+              <label for="direccionSeleccionada">Elige una de tus direcciones:</label>
+              <select name="direccionIndex" id="direccionSeleccionada">
+                <% direcciones.forEach(function (d, index) { %>
+                  <option value="<%= index %>">
+                    <%= d.calle %>, <%= d.comuna %>
+                  </option>
+                <% }); %>
+              </select>
+            </p>
+          <% } else { %>
+            <p>
+              No tienes direcciones guardadas.
+              <a href="/mis-direcciones">Agregar dirección</a>
+            </p>
+          <% } %>
+        </div>
+
+        <!-- Botón con un poco de espacio -->
+        <button type="submit" class="btn-primary" style="margin-top: 0.75rem;">
+          Confirmar reserva
+        </button>
+      </form>
+
+      <script>
+        (function () {
+          const radios = document.querySelectorAll('input[name="tipoEntrega"]');
+          const bloqueTiendas = document.getElementById('bloque-tiendas');
+          const bloqueDirecciones = document.getElementById('bloque-direcciones');
+
+          function actualizar() {
+            const seleccion = document.querySelector('input[name="tipoEntrega"]:checked').value;
+            if (seleccion === 'retiro') {
+              bloqueTiendas.style.display = 'block';
+              bloqueDirecciones.style.display = 'none';
+            } else {
+              bloqueTiendas.style.display = 'none';
+              bloqueDirecciones.style.display = 'block';
+            }
+          }
+
+          radios.forEach(function (r) {
+            r.addEventListener('change', actualizar);
+          });
+          actualizar();
+        })();
+      </script>
+
+    <% } else { %>
+      <p>Tu carrito está vacío.</p>
+    <% } %>
+  </div>
 </section>
-

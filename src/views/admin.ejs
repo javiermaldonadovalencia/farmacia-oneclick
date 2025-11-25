@@ -1,37 +1,279 @@
 <section>
   <h2>Panel Admin</h2>
-  <h3>Crear producto</h3>
-
-  <form method="post" action="/admin/producto/nuevo">
-    <div>
-      <label>Nombre</label>
-      <input name="nombre" required>
+    <% if (created) { %>
+    <div class="alert-success">
+      <div class="alert-icon">✔</div>
+      <div>
+        <strong>Producto creado</strong>
+        <p>El producto se ha registrado correctamente.</p>
+      </div>
     </div>
-    <div>
-      <label>Precio (CLP)</label>
-      <input name="precio" type="number" min="0" step="1" required>
-    </div>
-    <div>
-      <label>Stock</label>
-      <input name="stock" type="number" min="0" step="1" required>
-    </div>
-    <button type="submit">Crear</button>
-  </form>
-
-  <hr>
-
-  <h3>Productos</h3>
-  <% if (products && products.length) { %>
-    <ul>
-      <% products.forEach(p => { %>
-        <li>
-          <strong><%= p.nombre %></strong>
-          — $<%= p.precio.toLocaleString('es-CL') %>
-          — Stock: <%= p.stock %>
-        </li>
-      <% }) %>
-    </ul>
-  <% } else { %>
-    <p>No hay productos.</p>
   <% } %>
+
+
+  <!-- menú interno -->
+  <nav class="admin-nav">
+    <a href="#sec-crear" class="admin-nav-link">Crear producto</a>
+    <a href="#sec-productos" class="admin-nav-link">Productos</a>
+    <a href="#sec-pedidos" class="admin-nav-link">Pedidos</a>
+    <a href="#sec-suscriptores" class="admin-nav-link">Suscriptores newsletter</a>
+  </nav>
+
+  <!-- CREAR PRODUCTO -->
+  <section id="sec-crear" class="admin-section">
+    <form method="post" action="/admin/producto/nuevo">
+      <div>
+        <label>Nombre</label>
+        <input name="nombre" required>
+      </div>
+      <div>
+        <label>Precio (CLP)</label>
+        <input name="precio" type="number" min="0" step="1" required>
+      </div>
+      <div>
+        <label>Stock</label>
+        <input name="stock" type="number" min="0" step="1" required>
+      </div>
+      <button type="submit" class="admin-create-btn">Crear</button>
+    </form>
+  </section>
+
+  <!-- PRODUCTOS -->
+  <section id="sec-productos" class="admin-section">
+    <% if (products && products.length) { %>
+      <div class="admin-products">
+        <% products.forEach(function (p) { %>
+          <article class="admin-product-row">
+            <div class="admin-product-main">
+              <strong><%= p.nombre %></strong>
+              <span> — $<%= p.precio.toLocaleString('es-CL') %></span>
+            </div>
+
+            <div class="admin-actions-row">
+              <!-- Stock -->
+              <form action="/admin/producto/actualizar-stock" method="post" class="admin-stock-form">
+                <input type="hidden" name="id" value="<%= p.id %>">
+
+                <button type="button" class="stock-btn" onclick="
+                  const input = this.parentNode.querySelector('input[name=stock]');
+                  const v = parseInt(input.value || '0', 10) - 1;
+                  input.value = v < 0 ? 0 : v;
+                ">-</button>
+
+                <input
+                  type="number"
+                  name="stock"
+                  value="<%= p.stock %>"
+                  min="0"
+                  class="stock-input"
+                >
+
+                <button type="button" class="stock-btn" onclick="
+                  const input = this.parentNode.querySelector('input[name=stock]');
+                  const v = parseInt(input.value || '0', 10) + 1;
+                  input.value = v;
+                ">+</button>
+
+                <button type="submit" class="stock-save-btn">Guardar</button>
+              </form>
+
+              <!-- Descuento -->
+              <form action="/admin/producto/actualizar-descuento" method="post" class="admin-discount-form">
+                <input type="hidden" name="id" value="<%= p.id %>">
+                <input
+                  type="number"
+                  name="descuento"
+                  value="<%= p.descuento || 0 %>"
+                  min="0"
+                  max="100"
+                  class="stock-input"
+                >
+                <span>%</span>
+                <button type="submit" class="stock-save-btn discount-save-btn">
+                  Guardar desc.
+                </button>
+              </form>
+
+              <!-- Eliminar -->
+              <form action="/admin/producto/eliminar" method="post" class="admin-delete-form">
+                <input type="hidden" name="id" value="<%= p.id %>">
+                <button type="submit" class="delete-product-btn">Eliminar</button>
+              </form>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <p>No hay productos.</p>
+    <% } %>
+  </section>
+
+  <!-- PEDIDOS -->
+  <section id="sec-pedidos" class="admin-section">
+    <h3>Pedidos</h3>
+
+    <% if (pedidos && pedidos.length) { %>
+      <h4>Retiros en local</h4>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Total</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% pedidos.forEach(function (p) { %>
+            <% if (p.tipoEntrega === 'retiro') { %>
+              <tr>
+                <td><%= p.id %></td>
+                <td><%= p.email %></td>
+                <td><%= p.fecha.toLocaleString('es-CL') %></td>
+                <td>$<%= p.total.toLocaleString('es-CL') %></td>
+                <td>
+                  <form action="/admin/pedido/actualizar-estado" method="post" style="display:flex; gap:4px;">
+                    <input type="hidden" name="id" value="<%= p.id %>">
+                    <input type="hidden" name="email" value="<%= p.email %>">
+
+                    <select name="estado" style="font-size:0.8rem;">
+                      <option value="Pendiente" <%= p.estado === 'Pendiente' ? 'selected' : '' %>>Pendiente</option>
+                      <option value="Listo para retiro" <%= p.estado === 'Listo para retiro' ? 'selected' : '' %>>Listo para retiro</option>
+                      <option value="En camino" <%= p.estado === 'En camino' ? 'selected' : '' %>>En camino</option>
+                      <option value="Entregado" <%= p.estado === 'Entregado' ? 'selected' : '' %>>Entregado</option>
+                      <option value="Cancelado" <%= p.estado === 'Cancelado' ? 'selected' : '' %>>Cancelado</option>
+                    </select>
+
+                    <button type="submit" style="font-size:0.7rem; padding:2px 6px;">
+                      Guardar
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% } %>
+          <% }); %>
+        </tbody>
+      </table>
+
+      <h4>Pedidos delivery</h4>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Total</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% pedidos.forEach(function (p) { %>
+            <% if (p.tipoEntrega === 'delivery') { %>
+              <tr>
+                <td><%= p.id %></td>
+                <td><%= p.email %></td>
+                <td><%= p.fecha.toLocaleString('es-CL') %></td>
+                <td>$<%= p.total.toLocaleString('es-CL') %></td>
+                <td>
+                  <form action="/admin/pedido/actualizar-estado" method="post" style="display:flex; gap:4px;">
+                    <input type="hidden" name="id" value="<%= p.id %>">
+                    <input type="hidden" name="email" value="<%= p.email %>">
+
+                    <select name="estado" style="font-size:0.8rem;">
+                      <option value="Pendiente" <%= p.estado === 'Pendiente' ? 'selected' : '' %>>Pendiente</option>
+                      <option value="Listo para retiro" <%= p.estado === 'Listo para retiro' ? 'selected' : '' %>>Listo para retiro</option>
+                      <option value="En camino" <%= p.estado === 'En camino' ? 'selected' : '' %>>En camino</option>
+                      <option value="Entregado" <%= p.estado === 'Entregado' ? 'selected' : '' %>>Entregado</option>
+                      <option value="Cancelado" <%= p.estado === 'Cancelado' ? 'selected' : '' %>>Cancelado</option>
+                    </select>
+
+                    <button type="submit" style="font-size:0.7rem; padding:2px 6px;">
+                      Guardar
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% } %>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p>No hay pedidos registrados.</p>
+    <% } %>
+  </section>
+
+  <!-- SUSCRIPTORES -->
+  <section id="sec-suscriptores" class="admin-section">
+    <% if (subscriptions && subscriptions.length) { %>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% subscriptions.forEach(function (s) { %>
+            <tr>
+              <td><%= s.nombre %></td>
+              <td><%= s.email %></td>
+              <td><%= s.fecha.toLocaleString('es-CL') %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p>No hay suscriptores registrados.</p>
+    <% } %>
+  </section>
+
+ <script>
+  (function () {
+    const links = document.querySelectorAll('.admin-nav-link');
+    const sections = document.querySelectorAll('.admin-section');
+
+    function showSection(id) {
+      sections.forEach(sec => {
+        sec.classList.toggle('active', sec.id === id);
+      });
+      links.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+      });
+    }
+
+    links.forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').replace('#', '');
+        showSection(targetId);
+      });
+    });
+
+    // sección inicial: usa el hash si existe
+    if (sections.length) {
+      const hash = window.location.hash.replace('#', '');
+      if (hash) {
+        showSection(hash);
+      } else {
+        showSection('sec-crear');
+      }
+    }
+
+    // 👇 desvanecer mensaje de éxito si existe
+    const alertBox = document.querySelector('.alert-success');
+    if (alertBox) {
+      setTimeout(function () {
+        alertBox.style.opacity = '0';
+        alertBox.style.transform = 'translateY(-4px)';
+        setTimeout(function () {
+          alertBox.remove();
+        }, 400);
+      }, 4000); // 4 segundos
+    }
+  })();
+</script>
+
 </section>
+
